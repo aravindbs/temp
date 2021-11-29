@@ -1,0 +1,9 @@
+1.) Requirements: 
+    OS: Ubuntu 16.04
+    GNU G++: g++ (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+2.) Compile: g++ driver.cpp common.cpp dijkstra.cpp graph_generator.cpp heap.cpp heapsort.cpp kruskal.cpp union_find.cpp
+3.) Run: ./a.out
+4.) driver.cpp has the main function which runs all the 3 routing algorithms for 5 iterations of different source and target vertices for each pair of graphs (1 sparse and 1 dense). This is done for 5 such pairs of graphs.
+5.) The result has been recorded in result.txt. The readings given in the report have been extracted from this file by using output.py
+
+
