@@ -1,5 +1,5 @@
 #include"union_find.h"
-#include <malloc.h>
+#include <stdlib.h>
 
 union_find::union_find(int nodes):num_nodes(nodes){
     parent=(int *)malloc(sizeof(int)*nodes);

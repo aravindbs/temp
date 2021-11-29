@@ -15,7 +15,8 @@ class result{
     public:
     int *path;
     int length;
-    result(int *path, int len);
+    int maximum_bandwidth;
+    result(int *path, int len, int maximum_bandwidth);
     result();
 };
 

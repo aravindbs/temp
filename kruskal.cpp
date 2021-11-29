@@ -5,35 +5,35 @@
 
 using namespace std;
 
-bool kruskal::backtrack(int i, int &t, int *&path, int &pos, int *&visited, graph_node**&gh)
+bool kruskal::backtrack(int i, int &t, int *&path, int *&bw, int &pos, int *&visited, graph_node**&gh)
 {
     visited[i]=1;
-    path[pos]=i;
-    pos++;
-
     if(i==t){
         return true;
     }
 
     for(auto j=gh[i];j!=NULL;j=j->next){
-        int v=j->vertex;
+            int v=j->vertex;
             if(visited[v]==0){
+                path[pos]=v;
+                bw[pos]=j->weight;
+                pos++;
                 
-                if(backtrack(v,t,path,pos,visited, gh))
+                if(backtrack(v,t,path,bw,pos,visited, gh))
                 {
                     return true;
                 }
+                pos--;
             }
     }
 
-    pos--;
     return false;
 
 }
 
 result kruskal::find_max_bw_path(edge** edges, int num_edges, int num_nodes, int s, int t)
 {
-    heapsort hs(num_edges, edges);
+    class heapsort hs(num_edges, edges);
     union_find uf(num_nodes);
     hs.sort();
     graph_node **gh = new graph_node*[num_nodes];
@@ -73,9 +73,12 @@ result kruskal::find_max_bw_path(edge** edges, int num_edges, int num_nodes, int
 
 
     int *path = (int *)malloc(sizeof(int)*num_nodes);
-    int pos=0;
+    int *bw = new int[num_nodes];
+    int pos=1;
 
-    backtrack(s, t, path, pos, visited, gh);
+    backtrack(s, t, path, bw, pos, visited, gh);
+
+    path[0]=s;
 
     for(int i=0;i<num_nodes;i++){
         auto j=gh[i];
@@ -87,12 +90,20 @@ result kruskal::find_max_bw_path(edge** edges, int num_edges, int num_nodes, int
         }
     }
 
-    delete[] gh;
-    delete[] visited;
-
-
-    if(pos==0){
+    
+    if(pos==1){
         throw runtime_error("could not find a path from s to t using kruskal!!");
     }
-    return result(path, pos);
+
+    int min_bw=num_nodes+1;
+    for(int i=pos-1;i>=1;i--){
+        min_bw=min(bw[i],min_bw);
+    }
+
+    delete[] gh;
+    delete[] visited;
+    delete[] bw;
+
+
+    return result(path, pos, min_bw);
 }

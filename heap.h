@@ -22,6 +22,7 @@ class Myheap{
     void remove(int node);
     int get_max_bandwidth_node();
     int get_size();
+    int get_max_bandwidth();
     // void reset();
 
     // for debugging

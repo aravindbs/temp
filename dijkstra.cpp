@@ -58,7 +58,7 @@ result DijkstraWithoutHeap::find_max_bw_path(graph_node **gh, int s, int t){
 
             if(status[neigh]==unvisited){
                 status[neigh]=fringe;
-                cur_bw[neigh]=weight;
+                cur_bw[neigh]=min(weight, cur_bw[max_node]);
                 parent[neigh]=max_node;
             }
             else if(status[neigh]==fringe){
@@ -72,7 +72,7 @@ result DijkstraWithoutHeap::find_max_bw_path(graph_node **gh, int s, int t){
         
     }
 
-    if(status[t]==unvisited){
+    if(status[t]!=visited){
         throw runtime_error("Unexpected: could not find path from s to t");
     }
 
@@ -92,7 +92,7 @@ result DijkstraWithoutHeap::find_max_bw_path(graph_node **gh, int s, int t){
         cur=parent[cur];
     }
     final_path[p]=cur;
-    result r(final_path, total_nodes);
+    result r(final_path, total_nodes, cur_bw[t]);
 
     return r;
 
@@ -158,7 +158,7 @@ result DijkstraWithHeap::find_max_bw_path(graph_node **gh, int s, int t){
         }
     }
 
-    if(status[t]==unvisited){
+    if(status[t]!=visited){
         throw runtime_error("Unexpected: could not find path from s to t");
     }
 
@@ -178,7 +178,7 @@ result DijkstraWithHeap::find_max_bw_path(graph_node **gh, int s, int t){
         cur=parent[cur];
     }
     final_path[p]=cur;
-    result r(final_path, total_nodes);
+    result r(final_path, total_nodes,cur_bw[t]);
 
     return r;
 }

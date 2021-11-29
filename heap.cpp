@@ -235,6 +235,13 @@ int Myheap::get_max_bandwidth_node(){
     return indx_to_node[0];
 }
 
+int Myheap::get_max_bandwidth(){
+    if(size==0){
+        throw runtime_error("heap is empty, cannot return max bandiwdth node.");
+    }
+    return heap_array[0];
+}
+
 int Myheap::get_size(){
     return size;
 }

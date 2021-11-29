@@ -15,30 +15,24 @@ void print_info(int s, int t, result r,vector<vector<int>> &adj_matrix){
 
     cout<<"Source: "<<s<<" Target: "<<t<<endl;
     cout<<"######################"<<endl;
-    int max_bw=MAX_NODES+1;
     for(int i=0;i<r.length;i++){
         cout<<r.path[i]<<" ";
-	if(i>0){
-	max_bw=min(max_bw,adj_matrix[r.path[i-1]][r.path[i]]);
     }
-}
     cout<<endl;
-    cout<<"Max bw is: "<<max_bw<<endl;
+    cout<<"Max bw is: "<<r.maximum_bandwidth<<endl;
     cout<<"######################"<<endl;
 }
 
 void run_algos(graph_node **gh, edge** edges, int num_edges){
     srand(time(NULL));
 	vector<vector<int>> adj_matrix(MAX_NODES,vector<int>(MAX_NODES,0));
-	for(int i=0;i<MAX_NODES;i++){
-		for(auto j=gh[i];j!=NULL;j=j->next){
-			adj_matrix[i][j->vertex]=j->weight;
-			}
-			}
     for(int i=0;i<5;i++){
         cout<<i<<"th iteration of source & target"<<endl;
         int s = rand() % MAX_NODES;
         int t = rand() % MAX_NODES;
+        if(s==t){
+            t=(s+1)%MAX_NODES;
+        }
         cout<<"source: "<<s<<"target: "<<t<<endl;
         
         clock_t t1;
@@ -53,23 +47,29 @@ void run_algos(graph_node **gh, edge** edges, int num_edges){
         free(r.path);
         delete dj_noh;
 
+        result r1;
         t1 = clock();
         DijkstraWithHeap *dj = new DijkstraWithHeap(MAX_NODES);
-        r = dj->find_max_bw_path(gh, s, t);
+        r1 = dj->find_max_bw_path(gh, s, t);
         time_taken = float(clock()-t1)/CLOCKS_PER_SEC;
         cout<<"Dijkstra with heap time taken is: "<<time_taken<<endl;
-        print_info(s,t,r,adj_matrix);
-        free(r.path);
+        print_info(s,t,r1,adj_matrix);
+        free(r1.path);
         delete dj;
 
+
+        result r3;
         t1 = clock();
         kruskal *k = new kruskal();
-        r = k->find_max_bw_path(edges, num_edges, MAX_NODES, s, t);
+        r3 = k->find_max_bw_path(edges, num_edges, MAX_NODES, s, t);
         time_taken = float(clock()-t1)/CLOCKS_PER_SEC;
         cout<<"kruskal time taken is: "<<time_taken<<endl;
-        print_info(s,t,r,adj_matrix);
-        free(r.path);
+        print_info(s,t,r3,adj_matrix);
+        free(r3.path);
         delete k;
+        // if(r.maximum_bandwidth!=r1.maximum_bandwidth){
+        //     cout<<"not correct"<<endl;
+        // }
     }
 }
 
@@ -96,8 +96,8 @@ int main(){
 
         cout<<"For first graph:"<<endl;
         run_algos(gh1, edges1, gh_obj1.current_edges);
-        cout<<"For second graph:"<<endl;
-        run_algos(gh2, edges2, gh_obj2.current_edges);
+        // cout<<"For second graph:"<<endl;
+        // run_algos(gh2, edges2, gh_obj2.current_edges);
 
 
     }
