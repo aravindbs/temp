@@ -12,21 +12,21 @@ class MaxNodesException: public std::exception{
 
 #define heap_debug 0
 
-inline void swap(int *v, int p1, int p2){
-    int temp=v[p1];
+heapnode::heapnode(int b, int v):bandwidth(b),vertex(v){}
+
+inline void swap(heapnode **v, int p1, int p2){
+    auto temp=v[p1];
     v[p1]=v[p2];
     v[p2]=temp;
 }
 
 Myheap::Myheap(){
     size=0;
-    heap_array = (int *)malloc(sizeof(int)*MAX_NODES);
+    heap_array = (heapnode**)malloc(MAX_NODES*(sizeof(heapnode*)));
     node_to_indx = (int *)malloc(sizeof(int)*MAX_NODES);
-    indx_to_node = (int *)malloc(sizeof(int)*MAX_NODES);
     for(int i=0;i<MAX_NODES;i++){
-        heap_array[i]=-1;
+        heap_array[i]=NULL;
         node_to_indx[i]=-1;
-        indx_to_node[i]=-1;
     }
     // node_to_indx = new int[MAX_NODES];
     // node_to_indx = new int[MAX_NODES];
@@ -34,9 +34,12 @@ Myheap::Myheap(){
 }
 
 Myheap::~Myheap(){
-    free(heap_array);
     free(node_to_indx);
-    free(indx_to_node);
+
+    for(int i=0;i<size;i++){
+        delete heap_array[i];
+    }
+    free(heap_array);
 }
 
 void Myheap::insert(int node, int bandwidth){
@@ -47,8 +50,7 @@ void Myheap::insert(int node, int bandwidth){
         throw MaxNodesException(); 
     }
     node_to_indx[node]=size;
-    indx_to_node[size]=node;
-    heap_array[size] = bandwidth;
+    heap_array[size] = new heapnode(bandwidth, node);
     fix_heap_up(size);    
     size++;
     if(heap_debug){
@@ -67,20 +69,18 @@ void Myheap::fix_heap_up(int i){
     }
 
     while(i!=0){
-        if(heap_array[parent]<heap_array[i]){
-            int node1 = indx_to_node[parent];
-            int node2 = indx_to_node[i];
-            
-            indx_to_node[i] = node1;
-            indx_to_node[parent] = node2;
+        if(heap_array[parent]->bandwidth<=heap_array[i]->bandwidth){
+            int node1=heap_array[parent]->vertex;
+            int node2=heap_array[i]->vertex;
+
 
             int temp=node_to_indx[node1];
             node_to_indx[node1]=node_to_indx[node2];
             node_to_indx[node2]=temp;
 
-            temp = heap_array[i];
-            heap_array[i]=heap_array[parent];
-            heap_array[parent]=temp;
+            heapnode *temp1=heap_array[parent];
+            heap_array[parent]=heap_array[i];
+            heap_array[i]=temp1;
 
             i=parent;
             if(i%2==0){
@@ -97,6 +97,7 @@ void Myheap::fix_heap_up(int i){
     }
 }
 
+// the following 3 functions were for debugging, they are obsolete now.
 void Myheap::verify_heap_array(vector<int>&test_heap_array, int test_size)
 {
     cout<<"heap_array is: "<<endl;
@@ -104,9 +105,9 @@ void Myheap::verify_heap_array(vector<int>&test_heap_array, int test_size)
     for(int i=0;i<test_size;i++){
         cout<<heap_array[i]<<" ";
         fflush(stdout);
-        if(test_heap_array[i]!=heap_array[i]){
-            throw runtime_error("heap array is not as expected, test_heap_array != heap_array");
-        }
+        // if(test_heap_array[i]!=heap_array[i]){
+        //     throw runtime_error("heap array is not as expected, test_heap_array != heap_array");
+        // }
     }
 
     cout<<endl;
@@ -119,9 +120,9 @@ void Myheap::verify_indx_to_node_array(vector<int>&test_indx_to_node_array, int 
     for(int i=0;i<test_size;i++){
         cout<<indx_to_node[i]<<" ";
         fflush(stdout);
-        if(test_indx_to_node_array[i]!=indx_to_node[i]){
-            throw runtime_error(" indx array is not as expected, test_indx_array != heap_array");
-        }
+        // if(test_indx_to_node_array[i]!=indx_to_node[i]){
+        //     throw runtime_error(" indx array is not as expected, test_indx_array != heap_array");
+        // }
     }
 
     cout<<endl;
@@ -133,9 +134,9 @@ void Myheap::verify_node_to_indx_array(vector<int>&test_node_to_indx_array, int 
     for(int i=0;i<test_size;i++){
         cout<<node_to_indx[i]<<" ";
         fflush(stdout);
-        if(test_node_to_indx_array[i]!=node_to_indx[i]){
-            throw runtime_error(" node_to_indx array is not as expected");
-        }
+        // if(test_node_to_indx_array[i]!=node_to_indx[i]){
+        //     throw runtime_error(" node_to_indx array is not as expected");
+        // }
     }
 
     cout<<endl;
@@ -147,75 +148,45 @@ void Myheap::print_heap_array(){
         cout<<heap_array[i]<<" ";
     }
     cout<<endl;
-    cout<<"node to indx: "<<endl;
+    // cout<<"node to indx: "<<endl;
     
-    for(int i=0;i<MAX_NODES;i++){
-        cout<<node_to_indx[i]<<" ";
-    }
+    // for(int i=0;i<MAX_NODES;i++){
+    //     cout<<node_to_indx[i]<<" ";
+    // }
 
-    cout<<endl;
-    cout<<"indx_to_node: "<<endl;
-    for(int i=0;i<size;i++){
-        cout<<indx_to_node[i]<<" ";
-    }
-    cout<<endl;
+    // cout<<endl;
+    // cout<<"indx_to_node: "<<endl;
+    // for(int i=0;i<size;i++){
+    //     cout<<indx_to_node[i]<<" ";
+    // }
+    // cout<<endl;
 }
-void Myheap::remove(int node){
-    if(heap_debug > 0){
-        cout<<"delete called for: "<<node<<endl;
-    }
-    if(size==0){
-        throw runtime_error("cannot remove node, size of heap is 0");
-    }
-    int pos = node_to_indx[node];
-    int node1 = indx_to_node[size-1];
 
-    swap(heap_array, pos, size-1);
-
-    node_to_indx[node]=-1;
-    indx_to_node[size-1]=-1;
-
-    heap_array[size-1]=-1;
-
-    node_to_indx[node1]=pos;
-    indx_to_node[pos]=node1;
-
-    size--;
-
-    fix_heap_down(pos);
-    if(heap_debug>0){
-        cout<<"after removing: heap_array, node_to_indx, indx_to node:"<<endl;
-        print_heap_array();
-    }
-}
 
 void Myheap::fix_heap_down(int pos){
     int left=2*pos+1, right=2*pos+2;
     while((left<size)||(right<size)){
         int max_val_child=-1,max_child;
-        if(left<size && heap_array[left]>max_val_child){
+        if(left<size && heap_array[left]->bandwidth>max_val_child){
             max_child=left;
-            max_val_child=heap_array[left];
+            max_val_child=heap_array[left]->bandwidth;
         }
-        if(right<size && heap_array[right]>max_val_child){
+        if(right<size && heap_array[right]->bandwidth>max_val_child){
             max_child=right;
-            max_val_child=heap_array[right];
+            max_val_child=heap_array[right]->bandwidth;
         }
 
         if(max_val_child==-1){
             throw runtime_error("unable to find max_child!!");
         }
 
-        if(max_val_child>heap_array[pos]){
+        if(max_val_child>=heap_array[pos]->bandwidth){
+            int node1=heap_array[max_child]->vertex;
+            int node2=heap_array[pos]->vertex;
+            node_to_indx[node1]=pos;
+            node_to_indx[node2]=max_child;
+
             swap(heap_array, pos, max_child);
-            int node1 = indx_to_node[pos];
-            int node2 = indx_to_node[max_child];
-
-            indx_to_node[pos]=node2;
-            indx_to_node[max_child]=node1;
-
-            node_to_indx[node1]=max_child;
-            node_to_indx[node2]=pos;
 
             left=2*max_child+1;
             right=2*max_child+2;
@@ -232,14 +203,21 @@ int Myheap::get_max_bandwidth_node(){
         throw runtime_error("heap is empty, nothing to return!");
     }
 
-    return indx_to_node[0];
+    int to_return = heap_array[0]->vertex;
+    node_to_indx[to_return]=-1;
+    node_to_indx[heap_array[size-1]->vertex]=0;
+    delete heap_array[0];
+    heap_array[0]=NULL;
+    swap(heap_array, 0, size-1);
+    size--;
+    fix_heap_down(0);
+    return to_return;
 }
 
-int Myheap::get_max_bandwidth(){
-    if(size==0){
-        throw runtime_error("heap is empty, cannot return max bandiwdth node.");
-    }
-    return heap_array[0];
+void Myheap::update_node_bandwidth(int node ,int bandwidth){
+    int indx = node_to_indx[node];
+    heap_array[indx]->bandwidth=bandwidth;
+    fix_heap_up(indx);
 }
 
 int Myheap::get_size(){

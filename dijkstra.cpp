@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#define debug_dijkstra 0
+
 DijkstraWithoutHeap::DijkstraWithoutHeap(int nodes) : nodes(nodes){
     status = (int *)malloc(sizeof(int)*nodes);
     cur_bw = (int *)malloc(sizeof(int)*nodes);
@@ -46,6 +48,9 @@ result DijkstraWithoutHeap::find_max_bw_path(graph_node **gh, int s, int t){
 
     while (max_node!=-1)
     {
+        if(debug_dijkstra>0){
+            cout<<"max node is: "<<max_node<<endl;
+        }
         status[max_node]=visited;
 
         if(max_node==t){
@@ -131,7 +136,9 @@ result DijkstraWithHeap::find_max_bw_path(graph_node **gh, int s, int t){
         // cout<<"heap size: , before removing "<<heap.get_size()<<endl;
         // heap.print_heap_array();
         max_node = get_node_fringe_max_bw();
-        heap.remove(max_node);
+        if(debug_dijkstra>0){
+            cout<<"max node is: "<<max_node<<endl;
+        }
         // cout<<"after removing: "<<endl;
         // heap.print_heap_array();
         status[max_node]=visited;
@@ -151,8 +158,9 @@ result DijkstraWithHeap::find_max_bw_path(graph_node **gh, int s, int t){
             else if (status[u]==fringe && (cur_bw[u] < min(cur_bw[max_node], bw)))
             {
                 cur_bw[u]=min(cur_bw[max_node], bw);
-                heap.remove(u);
-                heap.insert(u, cur_bw[u]);
+                // heap.remove(u);
+                // heap.insert(u, cur_bw[u]);
+                heap.update_node_bandwidth(u, cur_bw[u]);
                 parent[u]=max_node;
             }
         }

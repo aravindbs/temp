@@ -4,13 +4,19 @@
 #include<vector>
 
 extern int MAX_NODES;
+class heapnode{
+    public:
+    int bandwidth;
+    int vertex;
+    heapnode(int b, int v);
+};
 
 class Myheap{
 
     private: 
     int *node_to_indx;
     int *indx_to_node;
-    int *heap_array;
+    heapnode **heap_array;
     int size=0;
     void fix_heap_up(int i);
     void fix_heap_down(int i);
@@ -19,10 +25,9 @@ class Myheap{
     Myheap();
     ~Myheap();
     void insert(int node, int bandwidth);
-    void remove(int node);
     int get_max_bandwidth_node();
     int get_size();
-    int get_max_bandwidth();
+    void update_node_bandwidth(int node, int bw);
     // void reset();
 
     // for debugging

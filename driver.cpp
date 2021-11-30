@@ -20,20 +20,20 @@ void print_info(int s, int t, result r,vector<vector<int>> &adj_matrix){
     }
     cout<<endl;
     cout<<"Max bw is: "<<r.maximum_bandwidth<<endl;
-    cout<<"######################"<<endl;
+    cout<<"######################"<<endl<<endl;
 }
 
 void run_algos(graph_node **gh, edge** edges, int num_edges){
     srand(time(NULL));
 	vector<vector<int>> adj_matrix(MAX_NODES,vector<int>(MAX_NODES,0));
     for(int i=0;i<5;i++){
-        cout<<i<<"th iteration of source & target"<<endl;
+        cout<<i+1<<"th iteration of source & target"<<endl<<endl;
         int s = rand() % MAX_NODES;
         int t = rand() % MAX_NODES;
         if(s==t){
             t=(s+1)%MAX_NODES;
         }
-        cout<<"source: "<<s<<"target: "<<t<<endl;
+        // cout<<"source: "<<s<<" target: "<<t<<endl;
         
         clock_t t1;
         result r;
@@ -68,7 +68,7 @@ void run_algos(graph_node **gh, edge** edges, int num_edges){
         free(r3.path);
         delete k;
         // if(r.maximum_bandwidth!=r1.maximum_bandwidth){
-        //     cout<<"not correct"<<endl;
+        //     throw runtime_error("not correct!!");
         // }
     }
 }
@@ -76,7 +76,7 @@ void run_algos(graph_node **gh, edge** edges, int num_edges){
 int main(){
 
     for(int i=0;i<5;i++){
-        cout<<"*********For pair of graphs******"<<endl;
+        cout<<"********* "<<i<<"th iteration of graphs******"<<endl;
         graph_generator gh_obj1(6, MAX_NODES);
         graph_node **gh1 = gh_obj1.get_graph();
         edge** edges1 = gh_obj1.get_edges();
@@ -94,10 +94,10 @@ int main(){
         // cout<<endl;
 
 
-        cout<<"For first graph:"<<endl;
+        cout<<"For sparse graph:"<<endl;
         run_algos(gh1, edges1, gh_obj1.current_edges);
-        // cout<<"For second graph:"<<endl;
-        // run_algos(gh2, edges2, gh_obj2.current_edges);
+        cout<<"For dense graph:"<<endl;
+        run_algos(gh2, edges2, gh_obj2.current_edges);
 
 
     }
